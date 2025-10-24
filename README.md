@@ -36,4 +36,4 @@ Al ejecutar, y para visualizar mejor los resultados, verás el menú interactivo
 
 ## Autores
 - Maryam Michelle Del Monte Ortega 320083527
-- Sahara Mariel Monroy Romero 
+- Sahara Mariel Monroy Romero 320206391
