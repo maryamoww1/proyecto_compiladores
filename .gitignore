@@ -49,7 +49,6 @@ tmp/
 *.tikz
 *.pgf-plot.tex
 
-*.pdf
 
 # PDF generado 
 reporte/latex/Reporte.pdf
