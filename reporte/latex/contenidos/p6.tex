@@ -1,0 +1,51 @@
+\section{Definición AFD}
+
+A diferencia del AFN, aquí cada par (estado, símbolo) tiene a lo sumo un destino, por eso la operación mover devuelve un único estado o nada.
+
+\subsection{Estructura del AFD}
+El tipo de datos del AFD agrupa:
+$
+Q \text{ (estados)}, \Sigma \text{ (alfabeto)},\Delta \text{ (transiciones)}, q_0 \text{ (inicial)}, F \text{ (finales)}.
+$
+
+\begin{itemize}
+    \item Estados: enteros (type Estado = Int).
+    \item Símbolos: caracteres (type Simbolo = Char).
+    \item Transiciones: tuplas $ (q, c, q) $ donde ir desde $q$ con $c$ lleva a $q$.
+    \item El registro AFD junta listas de estados, alfabeto, transiciones, inicial y finales, y deriva $\texttt{Eq}$ y $\texttt{Show}$ para comparar e imprimir.
+\end{itemize}
+
+
+\subsection{Operación mover}
+Dado un AFD $A$, un estado $q$ y un símbolo $c$, obtenemos el destino único si existe.
+
+La función mover toma un autómata AFD, un estado actual y un símbolo de entrada. Busca si existe una transición que salga exactamente desde ese estado con ese símbolo. Si la encuentra, devuelve el estado destino de esa transición. Si no existe tal transición, indica que no hay un siguiente estado (devuelve Nothing). En un AFD, para cada par (estado, símbolo) puede haber a lo sumo una transición, así que el resultado, cuando existe, es único.
+
+Entonces se construye una tabla (o mapa) que asocia cada par $ (q, c) $ con su destino $ q $:
+
+$
+\text{tabla}:\ (q, c) \mapsto q.
+$
+
+Se consulta $ (q, c) $; si está, se devuelve $ q $, si no, $\texttt{Nothing}$.
+
+
+\subsection{Normalización de estados}
+Aquí también normalizamos con el objetivo de ordenar y renumerar los estados para dejar el AFD en una forma estable.
+
+Pasos:
+
+\begin{enumerate}
+    \item Recolectar y ordenar estados: Miramos todos los estados que aparecen en el autómata (en la lista de estados, en las transiciones, en el inicial y en los finales). Quitamos duplicados y los ordenamos. Esto nos da una lista limpia y en orden estable.
+    \item Asignamos nuevos IDs consecutivos
+    A los estados ordenados les damos nuevos nombres: 0, 1, 2, …
+
+    Guardamos esa correspondencia en una tabla de renombrado para poder transformar todo de forma consistente.
+    \item Ahora sí aplicamos el renombrado de un jalón:
+    \begin{itemize}
+        \item Estado inicial: cambiamos su nombre usando la tabla.
+        \item Estados finales: cambiamos cada uno usando la misma tabla.
+        \item Transiciones: cada flecha (p, c, q) se convierte en (ren(p), c, ren(q)). Así garantizamos que todo el AFD usa la nueva numeración compacta.
+    \end{itemize}
+    \item Eliminamos símbolos repetidos en el alfabeto. 
+\end{enumerate}

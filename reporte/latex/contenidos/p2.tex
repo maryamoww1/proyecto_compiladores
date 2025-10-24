@@ -1,0 +1,70 @@
+
+\section{Definición y operaciones sobre AFN-$\varepsilon$}
+
+En esta sección se describen las operaciones básicas necesarias para el uso de el AFN-$\varepsilon$. Esta etapa es fundamental en el pipeline, pues sirve de puente entre las expresiones regulares y autómatas sin $\varepsilon$.
+
+\subsection{Estructura de datos y notación}
+
+
+Un AFN-$\varepsilon$ se modela por la tupla $A = (Q, \Sigma, \Delta, q_0, F)$, donde:
+
+\begin{itemize}
+    \item $Q$ es el conjunto de estados, representado por enteros.
+    \item $\Sigma$ es el alfabeto de entrada (símbolos de tipo \texttt{Char}).
+    \item $\Delta \subseteq Q \times (\Sigma \cup \{\varepsilon\}) \times Q$ es el conjunto de transiciones. En la implementación, cada transición se representa como una terna $(p, m, q)$ donde $m$ es de tipo \texttt{Maybe Simbolo}: $m = \texttt{Just}\ c$ para transiciones etiquetadas con $c \in \Sigma$ y $m = \texttt{Nothing}$ para transiciones $\varepsilon$.
+    \item $q_0 \in Q$ es el estado inicial.
+    \item $F \subseteq Q$ es el conjunto de estados finales.
+\end{itemize}
+
+\subsection{Autómata unidad (\texttt{afneUnidad})}
+
+La función \texttt{afneUnidad} construye el autómata más pequeño que reconoce exactamente un símbolo. Intuitivamente:
+\begin{itemize}
+    \item Tiene dos estados: uno de inicio $s$ y uno de aceptación $f = s + 1$.
+    \item Hay una sola transición $s \xrightarrow{c} f$ etiquetada con el símbolo $c$.
+    \item Si el autómata lee $c$, pasa al estado de aceptación. Si lee cualquier otro símbolo, no hay transición y no acepta.
+\end{itemize}
+
+Este parte elemental es la base con la que se arma todo lo demás en la construcción del algoritmo de Thompson. Cada término $c$ de una ER se convierte en un \texttt{afneUnidad} y luego se combina con concatenación, disyunción y estrella para formar autómatas más complejos.
+
+\subsection{Cerradura $\varepsilon$}
+
+
+La cerradura $\varepsilon$ de un conjunto de estados es, en pocas palabras, todo lo que puedes alcanzar moviéndote solo por transiciones $\varepsilon$, sin consumir ningún símbolo, empezando desde ese conjunto. Siempre incluye los estados de partida y todos los que se alcancen encadenando transiciones $\varepsilon$ las veces que haga falta, hasta que ya no aparezcan estados nuevos.
+
+En la función \texttt{cerraduraEpsilon} lo implementamos de forma directa:
+
+\begin{itemize}
+    \item Mantenemos dos conjuntos: uno de \emph{visitados} y una \emph{frontera} (o sea, estos estados pendientes de procesar).
+    \item Mientras la frontera no esté vacía, tomamos un estado, miramos a dónde podemos ir con $\varepsilon$, y añadimos a la frontera los que aún no estén visitados.
+    \item Al terminar, el conjunto de visitados es la cerradura $\varepsilon$.
+\end{itemize}
+
+\subsection{Movimiento con etiquetas}
+
+La operación \texttt{mover}(A, R, c) regresa los estados a los que se puede llegar desde cualquier estado de \(R\) usando una sola transición etiquetada con el símbolo \(c\), sin usar transiciones $\varepsilon$ adicionales. Para hacerlo eficiente, construimos una tabla que dado un par (estado, símbolo) nos devuelve los posibles destinos, luego unimos las respuestas para todos los estados de \(R\).
+
+Esta funcion se usa especialmente en:
+\begin{itemize}
+    \item Eliminación de $\varepsilon$, combinándola con la cerradura $\varepsilon$ antes y después de consumir \(c\).
+    \item En el método de subconjuntos, donde se aplica sobre conjuntos de estados para construir las transiciones del AFD.
+\end{itemize}
+
+\subsection{Normalización de estados}
+
+La función \texttt{normalizarEstados} renombra los estados para que queden como \(0, 1, 2, \dots\) en orden, y además ordena y deduplica alfabeto y transiciones. Esto tiene varias ventajas: facilita comparar resultados en pruebas, evita que la numeración dependa del orden de construcción y prepara el terreno para etapas como minimización y visualización.
+
+\subsection{Por qué usamos enteros para los estados y no Strings}
+
+Optamos por representar los estados con enteros en lugar de cadenas como “q0”, “q1”, etc., por motivos prácticos:
+\begin{itemize}
+    \item Comparar, ordenar y usar enteros como llaves en estructuras como \texttt{Map} o \texttt{Set} es más rápido y sencillo que hacerlo con cadenas.
+    \item Por simplicidad, ya que “q0” y \(0\) expresan lo mismo. Trabajar con números reduce errores y evita lógica extra para generar o interpretar nombres.
+    \item En etapas posteriores (pasar a determinista, minimización, tablas del lexer) es mas facil trabajarse con enteros.
+\end{itemize}
+
+\subsection{Otros detalles}
+
+\begin{itemize}
+    \item La representación de $\varepsilon$ mediante \texttt{Nothing} en \texttt{Maybe Simbolo} evita introducir un símbolo especial en $\Sigma$ y mantiene el tipo seguro.
+\end{itemize}

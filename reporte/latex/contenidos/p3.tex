@@ -1,0 +1,58 @@
+
+\section{Construcción de un AFN-$\varepsilon$ a partir de una expresión regular}
+
+Aquí describimos el algoritmo que transforma una expresión regular en un AFN-$\varepsilon$ usando las construcciones de Thompson que hemos visto en clase. La implementación se organiza en funciones que corresponden directamente a los operadores de la expresión regular: término (símbolo), unión (\(|\)), concatenación, y estrella de Kleene (\(*\)).
+
+\subsection{Procedimiento}
+
+Tenemos que $\texttt{regexToAfne}$ es la función principal. Dada una expresión regular $e$, se hace de manera recursiva:
+\begin{itemize}
+    \item Para un término $\texttt{Term}\;c$, se construye un AFN-$\varepsilon$ elemental con dos estados y una única transición etiquetada con $c$.
+    \item Para $\texttt{Or}$ de $e_1$ y $e_2$, se construyen los autómatas de $e_1$ y $e_2$, y se conectan mediante un nuevo estado inicial y uno final con transiciones $\varepsilon$ que conectan hacia $e_1$ o $e_2$, y desde los finales de cada uno hacia el nuevo final.
+    \item Para $\texttt{Concat}$ de $e_1$ con $e_2$, se construyen los autómatas de $e_1$ y $e_2$, y se conectan con transiciones $\varepsilon$ desde cada estado final de $e_1$ al estado inicial de $e_2$, entonces el inicial del resultado es el de $e_1$ y los finales son los de $e_2$, tal como vimos en clase.
+    \item Para la estrella $\texttt{Star}\;e$, se construye el autómata de $e$ y se rodea con un nuevo inicial y un nuevo final; se añaden transiciones $\varepsilon$ que permiten:
+    \begin{itemize}
+        \item aceptar la cadena vacía (del nuevo inicial al nuevo final),
+        \item entrar a una iteración (del nuevo inicial al inicial del autómata de $e$),
+        \item iterar nuevamente (de cada final de $e$ al inicial de $e$),
+        \item salir aceptando (de cada final de $e$ al nuevo final).
+    \end{itemize}
+\end{itemize}
+
+Finalmente, se aplica una normalización de estados para dejar los numeros ordenados.
+
+\subsection{Gestión de estados recién creados}
+
+Para las operaciones que introducen nuevos estados (o sea, unión y estrella) se utiliza un contador $\texttt{sig}$ que siempre apunta al próximo identificador libre. Cuando se crea un nuevo par de estados $(s, f)$ (nuevo inicial y nuevo final), se consumen dos valores consecutivos del contador y éste se actualiza en consecuencia. Esto nos ayuda a tener unicos identificadores y evitar pronlemas si queremos unir dos automatas.
+
+\subsection{Construcción de cada operador}
+
+\paragraph{Término}
+Dado un símbolo $c$, se construye un AFN-$\varepsilon$ con $Q = \{s, f\}, \Sigma = \{c\},\Delta = \{(s, c, f)\}, q_0 = s, F = \{f\},
+$
+donde $s$ y $f$ son estados recién creados consecutivos. Despues de la construcción, el contador avanza en $2$.
+
+\paragraph{Unión}
+Dados dos AFN-$\varepsilon$ correspondientes a $e_1$ y $e_2$, se crean dos estados nuevos $s$ (inicial) y $f$ (final). Se añaden transiciones $\varepsilon$ desde $s$ a cada inicial de los autómatas de $e_1$ y $e_2$, y desde cada estado final de ambos hacia $f$. El conjunto de estados y transiciones es la unión de partes no 'solapadas' de los componentes de ambos autómatas, más los nuevos extremos $s, f$ y las $\varepsilon$-transiciones que conectan. El alfabeto resultante es la unión de alfabetos, eliminando duplicados. El contador avanza en $2$.
+
+\paragraph{Concatenación}
+Dados los AFN-$\varepsilon$ de $e_1$ y $e_2$, se agregan transiciones $\varepsilon$ desde cada estado final del primero hacia el estado inicial del segundo. El estado inicial del resultado es el inicial del primero, y el conjunto de estados finales es el de los finales del segundo. El alfabeto es la unión de alfabetos con eliminación de duplicados. En esta operación no se consumen estados nuevos recien creados adicionales.
+
+\paragraph{Estrella de Kleene}
+Dado el AFN-$\varepsilon$ de $e$, se introducen dos estados nuevos $s$ y $f$. Se añaden:
+
+$
+s \xrightarrow{\varepsilon} f,
+s \xrightarrow{\varepsilon} q_0,
+x \xrightarrow{\varepsilon} q_0\,\quad
+x \xrightarrow{\varepsilon} f\ \text{ para todo } x \in F,
+$
+donde $q_0$ y $F$ son el inicial y los finales del autómata de $e$. Con esto ya aceptamos la cadena vacía, una o más repeticiones y podemos terminar tras cualquier repetición. El contador avanza en $2$.
+
+\subsection{Combinar alfabetos y transiciones}
+
+Cuando se combinan subautómatas, el alfabeto resultante es la unión de los alfabetos de cada componente, eliminando símbolos repetidos. Las transiciones del resultado son la concatenación de las transiciones de los operandos más las nuevas $\varepsilon$-transiciones que conectan la estructura (por ejemplo, de finales a iniciales en concatenación, o desde y hacia los nuevos extremos en unión y estrella).
+
+\subsection{Normalización}
+
+El autómata resultante lo normalizamos donde  volvemos a enumerar estados para ordenar y eliminar duplicados en el alfabeto y de las transiciones

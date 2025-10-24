@@ -1,0 +1,22 @@
+\section{Lexer: Generación del analizador léxico a partir de la MDD}
+
+Una vez construida la MDD, el siguiente paso fue implementar el \textbf{lexer}, que usa esta máquina para recorrer el texto de entrada y producir los tokens correspondientes.  
+El lexer ya no necesita ejecutar varios autómatas por separado, sino que se apoya directamente en la MDD para decidir qué token reconocer en cada punto del código fuente.
+
+\subsection*{Cómo funciona el lexer}
+La función principal \texttt{lexerM} toma una MDD y una cadena de entrada, y devuelve una lista de pares \texttt{(token, lexema)}.  
+El proceso sigue la idea de recorrer la entrada carácter por carácter mientras se avanza dentro de la MDD:
+\begin{itemize}
+  \item \textbf{Recorrido con la tabla de transiciones:} Se genera un mapa con las transiciones de la MDD. Por cada símbolo leído, el lexer se mueve al siguiente estado según la tabla.
+  \item \textbf{Reconocimiento de tokens:} Si se llega a un estado final, se guarda el lexema reconocido junto con el token que representa (usando las etiquetas definidas en la MDD).
+  \item \textbf{Regla de \textit{maximal munch}:} El lexer continúa avanzando mientras existan transiciones válidas y solo detiene el reconocimiento cuando ya no puede seguir.  
+  En ese momento, devuelve el último token válido encontrado y reanuda el proceso desde el resto de la cadena.
+  \item \textbf{Manejo de errores:} Si se encuentra un símbolo que no pertenece al alfabeto, se lanza un error léxico indicando el carácter inesperado.
+\end{itemize}
+
+\subsection*{Construcción del lexer desde expresiones regulares}
+La función \texttt{buildLexerFromRegex} hace todo el proceso:  
+toma una lista de pares \texttt{(token, expresión regular)} y convierte cada expresión en un AFD minimizado usando las etapas 
+Luego, todos esos AFDmin se combinan con \texttt{buildMDD} para formar la MDD global, que finalmente se pasa a \texttt{lexerM}.
+
+De esta forma, el lexer puede reconocer todos los tokens definidos en el lenguaje de forma determinista y con un solo recorrido sobre la entrada.

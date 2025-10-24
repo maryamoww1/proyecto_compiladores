@@ -1,0 +1,26 @@
+\section{Definición de AFN}
+
+\subsection{Estructura del AFN}
+Un AFN se modela por:
+$
+Q\ (\text{estados}), \Sigma\ (\text{alfabeto}), \Delta\ (\text{transiciones}), q_0\ (\text{inicial}), F\ (\text{finales})
+$
+
+Las transiciones tienen forma $(p, c, q)$ con $p, q \in Q$ y $c \in \Sigma$. El tipo $\texttt{AFN}$ agrupa estos componentes y permite compararlos e imprimirlos con $\texttt{Eq}$ y $\texttt{Show}$.
+
+\subsection{Operación $\texttt{mover}$}
+
+Dado un AFN A, un conjunto de estados R y un símbolo c, queremos saber a qué estados podemos ir en un solo paso usando c.
+
+Definición clara:
+$
+\texttt{mover}(A, R, c) = \{\, q \ \text{tal que existe}\ p \in R\ \text{con una transición}\ (p, c, q) \in \Delta \}.
+$
+Cómo se implementa:
+
+\begin{itemize}
+    \item Primero se crea una tabla que para cada par $(p, c)$, guarda la lista de destinos $[q]$.
+    \item Luego, por cada estado $p$ en $R$, se busca la entrada $(p, c)$ y se juntan todos los $q$ encontrados.
+    \item El resultado se devuelve como un conjunto, para no repetir estados.
+\end{itemize}
+

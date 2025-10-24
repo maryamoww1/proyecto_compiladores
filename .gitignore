@@ -1,0 +1,120 @@
+# === LaTeX ===
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.lof
+*.log
+*.lot
+*.nav
+*.out
+*.run.xml
+*.snm
+*.synctex.gz
+*.toc
+*.xdy
+*.xdv
+*.thm
+*.maf
+*.mtc*
+*.vrb
+*.dvi
+*.ps
+
+# Archivos generados por editores LaTeX
+*.synctex
+*.synctex(busy)
+*.synctex.gz(busy)
+*.bak
+*.backup
+*~
+*.tmp
+*.tmp.*
+*.swp
+*.swo
+
+# Salidas intermedias/temporales
+_tex/
+latex.out/
+build/
+temp/
+tmp/
+
+# Imágenes/stands temporales generadas por TikZ/pgfplots
+*.tikz
+*.pgf-plot.tex
+
+*.pdf
+
+# PDF generado 
+reporte/latex/Reporte.pdf
+
+# === Cabal / Haskell ===
+# Artefactos de compilación con Cabal
+dist/
+dist-*/
+cabal-dev/
+cabal.sandbox.config
+cabal.project.local
+cabal.project.local~
+cabal.project.local.lock
+*.cabal-sandbox/
+*.hi
+*.o
+*.dyn_o
+*.dyn_hi
+
+# Cachés y locks
+.cache/
+.stack-work/
+.global-cache/
+.hie/
+.hls/
+*.hie
+*.tix
+
+# Stack 
+.stack-work/
+stack.yaml.lock
+
+# Otros binarios y salidas
+/.ghc.environment.*
+/dist-newstyle/
+.result
+result/
+results/
+bin/
+build/
+*.prof
+*.auxprof
+*.hp
+*.eventlog
+
+# === Editor/OS ===
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+.directory
+
+# VSCode / JetBrains
+.vscode/
+.idea/
+*.iml
+
+# Niveles de sandbox o entornos locales
+.env
+.venv

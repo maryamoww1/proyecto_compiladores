@@ -1,0 +1,22 @@
+\section{MDD: Construcción de la Máquina Discriminadora a partir de los AFDmin}
+
+Después de minimizar cada autómata con \texttt{AFDMin}, el siguiente paso del proyecto fue construir la \textbf{MDD (Máquina Discriminadora Determinista)}.  
+La MDD combina todos los AFDmin en una sola máquina que permite al \textit{lexer} analizar la entrada de y decidir qué token reconocer en cada momento.
+
+Cada AFDmin representa las reglas para un token individual.  
+Sin embargo, el \textit{lexer} necesita procesar todo el código fuente en un único recorrido, no correr varios autómatas por separado.  
+Por eso, la MDD \textbf{integra todos los AFDmin} y \textbf{discrimina} cuál token corresponde a cada secuencia leída.
+
+\subsection*{Cómo se construye la MDD}
+La implementación de \texttt{buildMDD} sigue lo sigunte:
+\begin{itemize}
+  \item \textbf{Unificación del alfabeto:} Se crea un alfabeto global (\texttt{sigma}) con todos los símbolos que aparecen en los distintos AFDs.  
+  \item \textbf{Totalización:} Antes de combinar los AFDmin, cada uno se completa con un estado nodoMuerte para que todas las transiciones estén definidas.  
+  Esto evita errores y garantiza que la MDD sea completamente determinista.
+  \item \textbf{Estados como vectores:} Cada estado de la MDD representa un \textbf{vector de estados}, uno por cada AFDmin.  
+  Por ejemplo, si hay tres AFDs, un estado podría verse como \([q_1, q_2, q_3]\), donde cada componente es el estado actual de un token distinto.
+  \item \textbf{Exploración y generación de transiciones:} A partir del vector inicial (formado con los estados iniciales de todos los AFDs), se exploran todas las posibles transiciones para cada símbolo del alfabeto.  
+  Si aparece un nuevo vector, se le asigna un número de estado y se sigue expandiendo hasta cubrir todo el espacio alcanzable.
+  \item \textbf{Etiquetado de estados finales:} Un estado de la MDD se marca como final si al menos una de sus componentes pertenece a un estado final de su AFD correspondiente.  
+  Si hay varios posibles tokens, se aplica una \textbf{prioridad} (por ejemplo, el orden en que se definieron) para decidir cuál token reconocer primero.
+\end{itemize}

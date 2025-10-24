@@ -1,0 +1,59 @@
+
+\section{Eliminación de $\varepsilon$ y construcción del AFN equivalente}
+
+Queremos convertir un AFN con transiciones $\varepsilon$ en otro AFN sin ellas, pero que acepte las mismas cadenas. La idea clave es 'absorber' los efectos de $\varepsilon$ en dos lugares: al moverse por símbolos y al decidir qué estados son finales.
+
+\subsection{Función $\texttt{afnEpToAfn}$}
+\begin{itemize}
+    \item Entrada: un AFN-$\varepsilon$.
+    \item Salida: un AFN sin transiciones $\varepsilon$ que reconoce el mismo lenguaje.
+\end{itemize}
+
+Para hacerlo eficiente y claro, usamos:
+\begin{itemize}
+    \item Conjuntos (Data.Set) para evitar duplicados (igual que en los otros modulos).
+    \item Listas (Data.List) para ordenar y limpiar.
+    \item Mapas (Data.Map.Strict) para consultar rápido destinos y cerraduras.
+\end{itemize}
+
+\subsection{Cerradura $\varepsilon$ por estado}
+
+La cerradura $\varepsilon$ de un estado la guardamos en una tabla:
+$
+\texttt{tablaCierre}: \quad p \mapsto \text{cerradura}_\varepsilon(\{p\})
+$
+
+Así, cuando necesitemos la cerradura de $p$, la obtenemos en una consulta. Si falta alguna entrada, usamos por defecto $\{p\}$.
+
+\subsection{Movimiento por símbolo, incorporando $\varepsilon$}
+
+Para movernos por un símbolo $c$ desde un conjunto de estados $R$, primero hacemos lo obvio, que es mirar las transiciones etiquetadas con $c$. Montamos una tabla:
+$
+(p, c) \mapsto \{q \mid (p, c, q) \text{ es una transición no-}\varepsilon\}
+$
+
+Pero como existen $\varepsilon$, no debemos partir desde $p$ directo, si no desde todo lo que $p$ alcanza por $\varepsilon$. Y además, al llegar, también cerramos por $\varepsilon$. Queda:
+$
+\text{destino}(p, c) \;=\; \text{cerradura}_\varepsilon\Big(\ \text{mover}\big(c,\ \text{cerradura}_\varepsilon(\{p\})\big)\ \Big).
+$
+
+\subsection{Estados finales en el AFN resultante}
+Un estado $p$ será final si, desde $p$, puedes aceptar sin consumir símbolos adicionales (usando solo $\varepsilon$). Es decir:
+$
+p \in F' \quad \text{si} \quad \text{cerradura}_\varepsilon(\{p\}) \cap F \neq \emptyset.
+$
+
+O sea, si desde $p$ puedes ‘caer’ por $\varepsilon$ en algún final, entonces $p$ ya es final en el nuevo AFN.
+
+\subsection{Generar las nuevas transiciones}
+
+Para cada par $(p, c)$:
+\begin{enumerate}
+    \item Calcular $\text{destino}(p, c)$ con la composición anterior.
+    \item Por cada $q \in \text{destino}(p, c)$ agregar la transición $p \xrightarrow{c} q$.
+\end{enumerate}
+Al terminar:
+\begin{itemize}
+    \item Ordenar y eliminar duplicados en transiciones, estados y alfabeto.
+    \item Mantener el estado inicial original.
+\end{itemize}

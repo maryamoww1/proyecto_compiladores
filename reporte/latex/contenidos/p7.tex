@@ -1,0 +1,31 @@
+
+\section{Conversión de AFN a AFD}
+
+Este módulo implementa la construcción por subconjuntos que vimos en clase: convierte un autómata finito no determinista (AFN) en un autómata finito determinista (AFD). La idea central es que cada estado del AFD representa un conjunto de estados del AFN. De este modo, al leer un símbolo, el AFD “mueve” el conjunto actual al conjunto de todos los posibles destinos en el AFN.
+
+\begin{itemize}
+    \item Un estado del AFD equivale a “estar en cualquiera de estos estados del AFN”. O sea es un conjunto de estados del AFN.
+    \item La transición del AFD con un símbolo c desde ese conjunto se calcula aplicando mover del AFN “en paralelo” a todos los estados del conjunto, y uniendo los destinos en un nuevo conjunto.
+    
+    Si ese conjunto destino ya existe en el AFD, se reutiliza su identificador, pero si no existe, se crea un nuevo estado del AFD.
+    \item Los estados finales del AFD son aquellos conjuntos que contienen al menos un estado final del AFN.
+\end{itemize}
+
+\subsection{Cómo se construye en el código}
+\begin{itemize}
+    \item Se toma el alfabeto del AFN y se elimina duplicado.
+    \item Se define el estado inicial del AFD como el conjunto que sólo contiene el estado inicial del AFN.
+    \item Se realiza un recorrido tipo “BFS” sobre conjuntos donde se mantiene una cola de conjuntos por procesar.
+    
+    Se tiene un map que asigna a cada conjunto un identificador de estado del AFD.
+    
+    Para cada conjunto y cada símbolo del alfabeto, se calcula su conjunto destino usando la operación mover del AFN. Si el conjunto destino es nuevo, se registra con un nuevo ID y se agrega a la cola y si ya existe, se usa su ID.
+
+    Se registra la transición desde el ID del conjunto actual con el símbolo, hacia el ID del conjunto destino.
+    \item Al terminar el recorrido los estados del AFD son todos los IDs asignados y las transiciones son las que se acumularon en el map de transiciones.
+    
+    El inicial es 0 (el ID del conjunto inicial).
+    Los finales son aquellos IDs cuyo conjunto contiene al menos un estado final del AFN.
+
+    \item Finalmente, se normaliza el AFD.
+\end{itemize}

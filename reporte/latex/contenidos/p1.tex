@@ -1,0 +1,16 @@
+\section*{Introducción y motivación}
+
+El objetivo de este reporte es documentar nuestra construcción de un analizador léxico en Haskell mediante el pipeline: $ \text{ER} \rightarrow \text{AFN}-{\varepsilon} \rightarrow \text{AFN} \rightarrow \text{AFD} \rightarrow \text{AFDmin} \rightarrow \text{MDD} \rightarrow \text{lexer}, $ 
+
+con política de maximal munch y retroceso al último estado final. Se justifica cada decisión de diseño, se describen las estructuras de datos y se explican los algoritmos de transformación, así como otros detalles de implementación.
+
+\section{Diseño de la representación de expresiones regulares}
+
+Se define el tipo algebraico Expresion con cuatro constructores básicos: símbolo atómico o caracter (\texttt{Term}), concatenación (\texttt{Concat}), disyunción (\texttt{Or}) y estrella de Kleene (\texttt{Star}). Esto nos permite directamente desglosar el AST, y el instance Show garantiza visualización de las expresiones.
+
+En esta parte, una decisión relevante fue no incluir explícitamente el símbolo $\varepsilon$ como constructor en \texttt{Expresion}. Esto pensando en dos razones principales:
+
+\begin{itemize}
+    \item Simplificación del árbol sintáctico: al eliminar el caso especial $\varepsilon$, se reduce el número de patrones y casos que deben manejarse tanto en la construcción de autómatas como en transformaciones internas. En particular, se evita tratar derivaciones 'triviales' como $\varepsilon \cdot r = r$ y $r \cdot \varepsilon = r$, así como la ambigüedad del operador estrella sobre $\varepsilon$.
+    \item Delegación de $\varepsilon$ a la fase de construcción de autómatas: la presencia de $\varepsilon$-transiciones es más natural y controlable en el AFN-$\varepsilon$. Esto permite mantener el tipo \texttt{Expresion} mas sencillo y trasladar la complejidad a la parte de autómatas, que ya provee mecanismos para manejar $\varepsilon$.
+\end{itemize}

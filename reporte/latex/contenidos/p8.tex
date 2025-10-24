@@ -1,0 +1,15 @@
+
+\section{AFDmin: Minimización del Autómata Finito Determinista}
+A partir de esta etapa, las definiciones y las implementaciones de un paso a otro se integraron dentro de un mismo módulo. Esto se hizo con el propósito de reducir la cantidad de archivos en el proyecto.
+
+En esta parte del proyecto se implementó la función \texttt{minimizar}, que toma un AFD completo y devuelve una versión equivalente con el menor número de estados posible. La idea principal fue simplificar el autómata sin cambiar el lenguaje que reconoce.
+
+La implementación se divide en pasos pequeños y claros:
+\begin{itemize}
+  \item \textbf{Eliminar inalcanzables:} Se quitan los estados a los que nunca se puede llegar desde el inicial. Esto hace que el autómata sea más limpio y fácil de analizar.
+  \item \textbf{Completar con nodoMuerte:} Si falta alguna transición, se agrega un estado nodoMuerte que absorbe todos los casos no definidos. Esto asegura que el AFD quede completamente definido.
+  \item \textbf{Refinamiento de particiones:} Se agrupan los estados que se comportan igual (tienen las mismas transiciones hacia los mismos tipos de estados). El algoritmo va refinando estos grupos hasta que no haya más cambios.
+  \item \textbf{Reconstrucción:} Cada grupo final se convierte en un nuevo estado, generando el AFD minimizado.
+\end{itemize}
+
+El resultado es un AFD reducido y estable que servirá como base para los siguientes pasos del proyecto (MDD y lexer). 

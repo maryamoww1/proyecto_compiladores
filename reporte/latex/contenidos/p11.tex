@@ -1,0 +1,37 @@
+\section{Lenguaje IMP: Definición y lectura}
+
+El lenguaje IMP se define en el archivo \texttt{IMP.md}, donde se describen los tokens del lenguaje mediante expresiones regulares.  
+Cada línea asocia un nombre de token con su expresión.
+
+Entre los tokens principales definidos están:
+\begin{itemize}
+  \item \textbf{num:} reconoce números como \texttt{0}, \texttt{15} o \texttt{-42}.
+  \item \textbf{ident:} identifica nombres de variables o funciones.
+  \item \textbf{asign:} el operador de asignación \texttt{:=}.
+  \item \textbf{opArit:} operadores aritméticos como \texttt{+}, \texttt{-}, \texttt{*}, \texttt{/}.
+  \item \textbf{opRel:} operadores relacionales \texttt{<}, \texttt{>}, \texttt{=}.
+  \item \textbf{opBool:} operadores booleanos como \texttt{not}, \texttt{and}, \texttt{or}.
+  \item \textbf{bool:} los valores lógicos \texttt{true} y \texttt{false}.
+  \item \textbf{reservCond, reservCiclo, reservSkip:} las palabras reservadas del lenguaje como \texttt{if}, \texttt{then}, \texttt{else}, \texttt{while}, \texttt{do}, \texttt{for}, \texttt{skip}.
+  \item \textbf{puntuacion y delim:} los símbolos \texttt{;}, \texttt{\{ \}}, \texttt{( )}.
+  \item \textbf{WS (whitespace):} reconoce espacios, tabulaciones y saltos de línea.  
+  Este token no representa un símbolo del lenguaje, pero se incluye para que el analizador léxico pueda avanzar correctamente ignorando los espacios en blanco entre tokens válidos.
+\end{itemize}
+
+\subsection*{Lectura y procesamiento del archivo \texttt{IMP.md}}
+El \texttt{main} del proyecto inicia leyendo el archivo \texttt{IMP.md} ubicado en la carpeta \texttt{specs/}.  
+Primero se eliminan los comentarios con la función \texttt{borraComentarios}, que detecta y borra los bloques marcados con \texttt{*- -*} o \texttt{** **}.  
+Luego, \texttt{buildTokensFromSpecs} analiza el texto limpio, extrae los nombres de los tokens (las palabras antes del signo igual \texttt{=}) y construye la lista \texttt{impTokens}, que asocia cada nombre con su expresión regular correspondiente.
+
+\subsection*{Ejecución del programa principal}
+El \texttt{main} muestra un pequeño menú con ejemplos de programas IMP para probar el analizador.  
+Al seleccionar uno, el programa:
+\begin{enumerate}
+  \item Lee el archivo de ejemplo y muestra su contenido original.
+  \item Quita los comentarios del código fuente.
+  \item Analiza cada línea para marcar si tiene o no comentarios.
+  \item Se aplica el lexer sobre el código sin comentarios.
+  \item Muestra todos los tokens encontrados, incluyendo espacios y símbolos desconocidos.
+\end{enumerate}
+
+Y así finalmente simulamos un analizador léxico con nuestro lenguaje IMP :D.
