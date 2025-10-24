@@ -1,5 +1,6 @@
 
 # Proyecto de Compiladores
+## Equipo Cinnamoroll
 
 ## Resumen
 Este proyecto compila y ejecuta un analizador lexico sencillo para IMP. El main está en `proyecto/app/Main.hs`. El programa:
